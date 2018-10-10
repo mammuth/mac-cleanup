@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Taken from https://github.com/fwartner/mac-cleanup
+
+
 bytesToHuman() {
     b=${1:-0}; d=''; s=0; S=(Bytes {K,M,G,T,E,P,Y,Z}iB)
     while ((b > 1024)); do
@@ -9,6 +12,10 @@ bytesToHuman() {
     done
     echo "$b$d ${S[$s]} of space was cleaned up :3"
 }
+
+# Print current disk usage stats
+echo 'Current Disk Usage'
+df -h | head -n +2
 
 # Ask for the administrator password upfront
 sudo -v
@@ -81,7 +88,18 @@ fi
 echo 'Purge inactive memory...'
 sudo purge
 
+echo 'Purge npm cache...'
+npm cache clean --force
+sudo npm cache clean --force
+
+echo 'Purge ~/Library/Caches...'
+rm -rf ~/Library/Caches/*
+
 clear && echo 'Success!'
+
+# Print current disk usage stats
+echo 'Current Disk Usage'
+df -h | head -n +2
 
 newAvailable=$(df / | tail -1 | awk '{print $4}')
 count=$((newAvailable-oldAvailable))
